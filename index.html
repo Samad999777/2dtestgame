@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Poby_2dGame</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+      (function clearCache() {
+  var idb = window.indexedDB || window.mozIndexedDB ||
+            window.webkitIndexedDB || window.msIndexedDB;
+  if (!idb) return;
+
+  var open;
+  try { open = idb.open('/idbfs') } catch(e) { return; }
+
+  var errorHandler = function(e){ e.preventDefault(); e.stopImmediatePropagation(); };
+  open.onabort = open.onerror = errorHandler;
+  open.onupgradeneeded = function(upgradeEvent) {
+    upgradeEvent.target.transaction.abort();
+  };
+
+  open.onsuccess = function(openEvent) {
+    var db = openEvent.target.result;
+    db.onerror = db.onabort = errorHandler;
+
+    try {
+      var store = db.transaction('FILE_DATA', 'readwrite').objectStore('FILE_DATA');
+      store.openCursor().onsuccess = function(cursorEvent) {
+        var cursor = cursorEvent.target.result;
+        if (cursor) {
+          if (cursor.key.indexOf('/UnityCache/Shared/') !== -1) cursor.delete();
+          cursor.continue();
+        }
+      };
+    } catch(e) {}
+
+    db.close();
+  };
+})();
+
+    </script>
+    <script>
+      var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Build.json", {onProgress: UnityProgress});
+    </script>
+  </head>
+  <body>
+    <div class="webgl-content">
+      <div id="unityContainer" style="width: 960px; height: 600px"></div>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="unityInstance.SetFullscreen(1)"></div>
+        <div class="title">Poby_2dGame</div>
+      </div>
+    </div>
+  </body>
+</html>
